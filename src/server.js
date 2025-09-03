@@ -5,9 +5,28 @@ process.env.NODE_ENV = "development";
 const PORT = process.env.PORT || 3000; 
 
 const app = require('./app');
+const issueModel = require('./models/issueModel');
 
-server.add(12);
+// Initialize database tables on startup
+const initializeDatabase = async () => {
+    try {
+        await issueModel.initializeIssuesTable();
+        console.log('✅ Database initialized successfully');
+    } catch (error) {
+        console.error('❌ Error initializing database:', error);
+        // Don't exit the process, just log the error
+    }
+};
 
-app.listen(PORT, () => {
-    console.log(`🚀 Server listening on http://localhost:${PORT}`);
-});
+const startServer = async () => {
+    // Initialize database first
+    await initializeDatabase();
+    
+    app.listen(PORT, () => {
+        console.log(`🚀 Server listening on http://localhost:${PORT}`);
+        console.log(`📝 API Documentation: http://localhost:${PORT}/api/bugbot/docs`);
+        console.log(`🔧 Bugbot Status: http://localhost:${PORT}/api/bugbot/status`);
+    });
+};
+
+startServer().catch(console.error);
